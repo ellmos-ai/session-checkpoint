@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "session-checkpoint"
+version = "0.1.0"
+description = "Local, application-neutral session checkpoint storage with integrity checks."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "ellmos-ai contributors" }]
+keywords = ["session", "checkpoint", "sqlite", "local-first"]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+session-checkpoint = "session_checkpoint.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["session_checkpoint*"]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+testpaths = ["tests"]

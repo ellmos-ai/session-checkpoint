@@ -1,0 +1,45 @@
+{
+  "schema": "ellmos.module.v2",
+  "id": "session-checkpoint",
+  "display_name": "session-checkpoint",
+  "version": "0.1.0",
+  "status": "development",
+  "visibility": "private",
+  "category": "runtime",
+  "kind": "library",
+  "description": "Application-neutral, local-only session checkpoint storage with integrity verification and reversible export/import.",
+  "provides": [
+    "session.checkpoint",
+    "session.checkpoint.integrity",
+    "session.checkpoint.migration"
+  ],
+  "requires": [],
+  "optional": [],
+  "conflicts": [],
+  "surfaces": [
+    "library",
+    "cli"
+  ],
+  "entrypoints": {
+    "cli": "session-checkpoint",
+    "python": "session_checkpoint.CheckpointStore"
+  },
+  "boundaries": {
+    "data": "application-defined-sensitive",
+    "network": "none",
+    "platforms": [
+      "windows",
+      "macos",
+      "linux"
+    ]
+  },
+  "state": {
+    "location": "user-configurable-local",
+    "ownership": "module"
+  },
+  "source_of_truth": {
+    "type": "git-repository",
+    "repository": "https://github.com/ellmos-ai/session-checkpoint",
+    "path": "."
+  }
+}
