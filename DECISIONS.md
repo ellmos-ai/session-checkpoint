@@ -1,8 +1,8 @@
 # DECISIONS.md — Architecture decisions
 
 **Version:** 0.1
-**Updated:** 2026-08-08
-**Reason:** Initial carrier decisions
+**Updated:** 2026-08-09
+**Reason:** Sensitive-file and import-resource boundary
 **Purpose:** Preserve why the state boundary has this shape.
 
 ## ADR-001: Standalone capability instead of a chat-router extension
@@ -41,6 +41,19 @@ requested.
 The carrier returns stored payloads. It does not write tasks, memory, configuration, files, or
 any other application state. If a later application defines restoration, that belongs in its
 adapter and needs its own transaction and rollback contract.
+
+## ADR-007: Bounded import and private local files
+
+An import is validated before any database write and is bounded by record count and aggregate
+canonical payload size. The CLI also bounds bytes before JSON parsing, preventing an oversized
+local file from bypassing the core limits through whitespace or encoding expansion. Limits are
+constructor parameters so an embedding application can make them stricter without forking the
+carrier.
+
+Stores and JSON exports may contain sensitive application context. They are created with
+owner-only POSIX mode bits and rechecked after atomic replacement. On Windows, the carrier relies
+on the containing directory's ACL and documents that boundary rather than claiming that
+`os.chmod` configures Windows security descriptors.
 
 ---
 <!-- REMEMBER: ENDUSERTEXTE BEKOMMEN ECHTE UMLAUTE Ü Ö Ä -->

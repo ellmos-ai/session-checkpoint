@@ -2,7 +2,14 @@
 
 Checkpoint payloads are application-defined and may contain sensitive local context. Keep the
 store and exports outside shared or published directories unless the application has explicitly
-redacted them. The package performs no network access.
+redacted them. On POSIX, the carrier creates these files with owner-only mode bits and restricts
+compatible existing stores when opened. On Windows, use a directory ACL that grants access only
+to the intended account; Python mode bits are not Windows ACLs. The package performs no network
+access.
+
+Imports are bounded by record count and aggregate canonical payload. The JSON CLI also bounds the
+input file before parsing. Applications may configure stricter core limits for their local risk
+and data shape.
 
 SHA-256 verifies local payload integrity; it is not authentication or encryption. Applications
 that accept checkpoint bundles from another trust domain need their own authenticated transport

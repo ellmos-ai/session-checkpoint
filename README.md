@@ -14,6 +14,8 @@ Local, application-neutral session checkpoint storage for Python and JSON-speaki
 - Canonicalizes JSON-object payloads and verifies their SHA-256 on every read.
 - Separates applications by namespace and protects imported source references from collision.
 - Exports and imports complete local checkpoint sets for migration and rollback tests.
+- Bounds imports to 1,000 checkpoints, 16 MiB aggregate canonical payload, and a 32 MiB CLI
+  input file by default; Python callers can choose stricter carrier limits.
 
 ## What it does not do
 
@@ -66,7 +68,10 @@ session-checkpoint delete --store local-checkpoints.sqlite --namespace example-a
 ```
 
 Expected CLI failures return exit code 1 and a JSON object on stdout. Export writes payloads to an
-explicit local file; treat that file as sensitive application data.
+explicit local file; treat that file as sensitive application data. On POSIX, new stores and
+exports are created with owner-only mode bits and compatible existing stores are restricted on
+open. On Windows, place them in a directory whose ACL grants access only to the intended account;
+Python mode bits do not configure Windows ACLs.
 
 ## Status and release
 

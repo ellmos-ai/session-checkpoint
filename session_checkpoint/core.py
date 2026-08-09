@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import sqlite3
+import stat
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -16,6 +18,10 @@ from typing import Any, Iterator, Mapping
 SCHEMA_VERSION = 1
 EXPORT_SCHEMA = "ellmos.session-checkpoint-export.v1"
 DEFAULT_MAX_PAYLOAD_BYTES = 1024 * 1024
+DEFAULT_MAX_IMPORT_CHECKPOINTS = 1000
+DEFAULT_MAX_IMPORT_PAYLOAD_BYTES = 16 * 1024 * 1024
+DEFAULT_MAX_IMPORT_FILE_BYTES = 32 * 1024 * 1024
+_PRIVATE_FILE_MODE = stat.S_IRUSR | stat.S_IWUSR
 _TOKEN_RE = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9._:-]{0,127})?\Z")
 _EXPECTED_TABLES = {"checkpoint_meta", "checkpoints"}
 _EXPECTED_COLUMNS = {
@@ -52,6 +58,48 @@ class CheckpointConflict(CheckpointError):
 
 class StoreSchemaError(CheckpointError):
     """The configured SQLite file is not a compatible checkpoint store."""
+
+
+class StoreSecurityError(CheckpointError):
+    """A sensitive carrier file could not be restricted to its owner on POSIX."""
+
+
+def _restrict_private_file(path: Path) -> None:
+    """Apply and verify owner-only POSIX mode bits.
+
+    Windows ACLs are inherited from the containing directory and cannot be represented by
+    ``os.chmod``. Callers must therefore place stores and exports in an ACL-protected directory
+    on Windows.
+    """
+
+    if os.name != "posix":
+        return
+    try:
+        path.chmod(_PRIVATE_FILE_MODE)
+        actual_mode = stat.S_IMODE(path.stat().st_mode)
+    except OSError as error:
+        raise StoreSecurityError(f"Could not restrict sensitive file {path}: {error}") from error
+    if actual_mode & (stat.S_IRWXG | stat.S_IRWXO):
+        raise StoreSecurityError(
+            f"Sensitive file {path} has non-private POSIX mode {oct(actual_mode)}"
+        )
+
+
+def _create_private_file(path: Path) -> bool:
+    """Create an empty owner-only file without following a pre-existing path."""
+
+    flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+    try:
+        descriptor = os.open(path, flags, _PRIVATE_FILE_MODE)
+    except FileExistsError:
+        return False
+    try:
+        os.close(descriptor)
+    except OSError:
+        path.unlink(missing_ok=True)
+        raise
+    _restrict_private_file(path)
+    return True
 
 
 def _utc_now() -> str:
@@ -209,11 +257,26 @@ class Checkpoint:
 class CheckpointStore:
     """Owns checkpoint rows in one local SQLite database."""
 
-    def __init__(self, path: str | Path, *, max_payload_bytes: int = DEFAULT_MAX_PAYLOAD_BYTES):
+    def __init__(
+        self,
+        path: str | Path,
+        *,
+        max_payload_bytes: int = DEFAULT_MAX_PAYLOAD_BYTES,
+        max_import_checkpoints: int = DEFAULT_MAX_IMPORT_CHECKPOINTS,
+        max_import_payload_bytes: int = DEFAULT_MAX_IMPORT_PAYLOAD_BYTES,
+    ):
         self.path = Path(path).expanduser().resolve()
         self.max_payload_bytes = _positive_int("max_payload_bytes", max_payload_bytes)
+        self.max_import_checkpoints = _positive_int(
+            "max_import_checkpoints", max_import_checkpoints
+        )
+        self.max_import_payload_bytes = _positive_int(
+            "max_import_payload_bytes", max_import_payload_bytes
+        )
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        _create_private_file(self.path)
         self._initialize()
+        _restrict_private_file(self.path)
 
     @contextmanager
     def _connection(self) -> Iterator[sqlite3.Connection]:
@@ -494,7 +557,28 @@ class CheckpointStore:
         raw_items = bundle.get("checkpoints")
         if not isinstance(raw_items, list):
             raise CheckpointValidationError("Import bundle checkpoints must be an array")
-        candidates = [self._checkpoint_from_export(item) for item in raw_items]
+        if len(raw_items) > self.max_import_checkpoints:
+            raise CheckpointValidationError(
+                f"Import bundle contains more than {self.max_import_checkpoints} checkpoints"
+            )
+        candidates: list[Checkpoint] = []
+        aggregate_payload_bytes = 0
+        for raw_item in raw_items:
+            candidate = self._checkpoint_from_export(raw_item)
+            encoded_payload = json.dumps(
+                candidate.payload,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            ).encode("utf-8")
+            aggregate_payload_bytes += len(encoded_payload)
+            if aggregate_payload_bytes > self.max_import_payload_bytes:
+                raise CheckpointValidationError(
+                    "Import bundle aggregate payload exceeds the "
+                    f"{self.max_import_payload_bytes}-byte carrier limit"
+                )
+            candidates.append(candidate)
         ids = [item.id for item in candidates]
         if len(ids) != len(set(ids)):
             raise CheckpointConflict("Import bundle contains duplicate checkpoint ids")

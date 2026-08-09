@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
+import stat
 
 import pytest
 
@@ -239,3 +241,59 @@ def test_export_is_json_serializable(tmp_path):
     store.create(namespace="test", session_id="session-001", payload={"umlaut": "für"})
     encoded = json.dumps(store.export_bundle(), ensure_ascii=False)
     assert "für" in encoded
+
+
+def test_import_rejects_too_many_checkpoints_before_writing(tmp_path):
+    source = CheckpointStore(tmp_path / "source.sqlite")
+    source.create(namespace="test", session_id="session-001", payload={"value": 1})
+    source.create(namespace="test", session_id="session-002", payload={"value": 2})
+    bundle = source.export_bundle()
+
+    target = CheckpointStore(tmp_path / "target.sqlite", max_import_checkpoints=1)
+    with pytest.raises(CheckpointValidationError, match="more than 1 checkpoints"):
+        target.import_bundle(bundle, dry_run=False)
+    assert target.list(namespace="test") == []
+
+
+def test_import_rejects_aggregate_payload_bytes_before_writing(tmp_path):
+    source = CheckpointStore(tmp_path / "source.sqlite")
+    source.create(namespace="test", session_id="session-001", payload={"value": "one"})
+    source.create(namespace="test", session_id="session-002", payload={"value": "two"})
+    bundle = source.export_bundle()
+    aggregate_bytes = sum(
+        len(
+            json.dumps(
+                item["payload"],
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
+        for item in bundle["checkpoints"]
+    )
+
+    target = CheckpointStore(
+        tmp_path / "target.sqlite",
+        max_import_payload_bytes=aggregate_bytes - 1,
+    )
+    with pytest.raises(CheckpointValidationError, match="aggregate payload exceeds"):
+        target.import_bundle(bundle, dry_run=False)
+    assert target.list(namespace="test") == []
+
+    boundary = CheckpointStore(
+        tmp_path / "boundary.sqlite",
+        max_import_payload_bytes=aggregate_bytes,
+    )
+    applied = boundary.import_bundle(bundle, dry_run=False)
+    assert applied["inserted"] == [1, 2]
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX mode bits are not Windows ACLs")
+def test_store_and_export_are_private_files_on_posix(tmp_path):
+    from session_checkpoint.cli import _atomic_json_write
+
+    store = CheckpointStore(tmp_path / "store.sqlite")
+    exported = _atomic_json_write(tmp_path / "export.json", {"checkpoints": []})
+
+    assert stat.S_IMODE(store.path.stat().st_mode) & (stat.S_IRWXG | stat.S_IRWXO) == 0
+    assert stat.S_IMODE(exported.stat().st_mode) & (stat.S_IRWXG | stat.S_IRWXO) == 0

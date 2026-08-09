@@ -2,16 +2,16 @@
 name: "session-checkpoint-state"
 type: project-state
 version: 0.1.0
-updated: 2026-08-08
-last_verified: 2026-08-08
+updated: 2026-08-09
+last_verified: 2026-08-09
 description: "Current verified project state and claim boundary."
 ---
 
 # STATE.md — Current state
 
 **Version:** 0.1
-**Updated:** 2026-08-08
-**Reason:** Initial carrier implementation
+**Updated:** 2026-08-09
+**Reason:** Security hardening before K9 contract pin
 **Purpose:** State what exists, what is proven, and what remains open.
 
 ## Implemented
@@ -21,6 +21,8 @@ description: "Current verified project state and claim boundary."
 - Canonical JSON-object payloads with SHA-256 verification on read.
 - Namespace isolation and unique application source references.
 - Reversible JSON export/import with dry-run and fail-closed conflict preflight.
+- Bounded import count, aggregate payload, and CLI input-file size.
+- Owner-only POSIX file creation and explicit Windows directory-ACL boundary.
 - No network access and no application-specific state collection.
 
 ## Claim boundary

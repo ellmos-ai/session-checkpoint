@@ -16,6 +16,8 @@ Lokaler, anwendungsneutraler Speicher für Session-Checkpoints mit Python-API un
 - JSON-Objekte werden kanonisch gespeichert und bei jedem Lesen über SHA-256 geprüft.
 - Namensräume trennen Anwendungen; Quellreferenzen verhindern doppelte Migrationszeilen.
 - Export und Import unterstützen spätere Migrations- und Rückwegtests.
+- Importe sind standardmäßig auf 1.000 Checkpoints, 16 MiB kanonische Gesamtnutzlast und bei der
+  CLI auf eine 32 MiB große Eingabedatei begrenzt; Python-Aufrufer können strengere Grenzen setzen.
 
 ## Was das Modul bewusst nicht leistet
 
@@ -68,7 +70,11 @@ session-checkpoint delete --store local-checkpoints.sqlite --namespace beispiel-
 ```
 
 Erwartete CLI-Fehler liefern Exit-Code 1 und ein JSON-Objekt auf stdout. Ein Export enthält
-Anwendungsdaten und muss deshalb wie eine sensible lokale Datei behandelt werden.
+Anwendungsdaten und muss deshalb wie eine sensible lokale Datei behandelt werden. Unter POSIX
+werden neue Stores und Exporte mit Rechten ausschließlich für den Eigentümer angelegt; passende
+bestehende Stores werden beim Öffnen nachgehärtet. Unter Windows müssen sie in einem Verzeichnis
+liegen, dessen ACL nur dem vorgesehenen Konto Zugriff gewährt, weil Python-Dateimodi keine
+Windows-ACL konfigurieren.
 
 ## Stand und Freigabe
 

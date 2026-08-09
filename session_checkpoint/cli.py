@@ -6,14 +6,17 @@ import argparse
 import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
 from .core import (
     EXPORT_SCHEMA,
+    DEFAULT_MAX_IMPORT_FILE_BYTES,
     SCHEMA_VERSION,
     CheckpointError,
     CheckpointStore,
+    _restrict_private_file,
     prepare_checkpoint,
 )
 
@@ -22,8 +25,23 @@ def _print(payload: Any) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
 
 
-def _read_object(path: str | Path, *, label: str) -> dict[str, Any]:
-    value = json.loads(Path(path).expanduser().read_text(encoding="utf-8"))
+def _read_object(
+    path: str | Path,
+    *,
+    label: str,
+    max_bytes: int | None = None,
+) -> dict[str, Any]:
+    source = Path(path).expanduser()
+    if max_bytes is None:
+        encoded = source.read_bytes()
+    else:
+        if type(max_bytes) is not int or max_bytes <= 0:
+            raise ValueError("max_bytes must be a positive integer")
+        with source.open("rb") as handle:
+            encoded = handle.read(max_bytes + 1)
+        if len(encoded) > max_bytes:
+            raise ValueError(f"{label} exceeds the {max_bytes}-byte input limit")
+    value = json.loads(encoded.decode("utf-8"))
     if not isinstance(value, dict):
         raise ValueError(f"{label} must contain a JSON object")
     return value
@@ -32,14 +50,25 @@ def _read_object(path: str | Path, *, label: str) -> dict[str, Any]:
 def _atomic_json_write(path: str | Path, payload: dict[str, Any]) -> Path:
     target = Path(path).expanduser().resolve()
     target.parent.mkdir(parents=True, exist_ok=True)
-    temporary = target.with_name(f".{target.name}.{os.getpid()}.tmp")
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{target.name}.",
+        suffix=".tmp",
+        dir=target.parent,
+        text=True,
+    )
+    temporary = Path(temporary_name)
     try:
-        temporary.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as handle:
+            descriptor = -1
+            handle.write(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        _restrict_private_file(temporary)
         os.replace(temporary, target)
+        _restrict_private_file(target)
     finally:
+        if descriptor >= 0:
+            os.close(descriptor)
         temporary.unlink(missing_ok=True)
     return target
 
@@ -162,7 +191,11 @@ def main(argv: list[str] | None = None) -> int:
                 "checkpoints": len(bundle["checkpoints"]),
             }
         elif args.command == "import":
-            bundle = _read_object(args.input, label="input")
+            bundle = _read_object(
+                args.input,
+                label="input",
+                max_bytes=DEFAULT_MAX_IMPORT_FILE_BYTES,
+            )
             result = store.import_bundle(bundle, dry_run=not args.apply)
         else:
             raise AssertionError(args.command)

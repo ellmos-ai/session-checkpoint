@@ -1,6 +1,10 @@
 """Public API for session-checkpoint."""
 
 from .core import (
+    DEFAULT_MAX_IMPORT_CHECKPOINTS,
+    DEFAULT_MAX_IMPORT_FILE_BYTES,
+    DEFAULT_MAX_IMPORT_PAYLOAD_BYTES,
+    DEFAULT_MAX_PAYLOAD_BYTES,
     EXPORT_SCHEMA,
     SCHEMA_VERSION,
     Checkpoint,
@@ -10,10 +14,15 @@ from .core import (
     CheckpointStore,
     CheckpointValidationError,
     StoreSchemaError,
+    StoreSecurityError,
     prepare_checkpoint,
 )
 
 __all__ = [
+    "DEFAULT_MAX_IMPORT_CHECKPOINTS",
+    "DEFAULT_MAX_IMPORT_FILE_BYTES",
+    "DEFAULT_MAX_IMPORT_PAYLOAD_BYTES",
+    "DEFAULT_MAX_PAYLOAD_BYTES",
     "EXPORT_SCHEMA",
     "SCHEMA_VERSION",
     "Checkpoint",
@@ -23,6 +32,7 @@ __all__ = [
     "CheckpointStore",
     "CheckpointValidationError",
     "StoreSchemaError",
+    "StoreSecurityError",
     "prepare_checkpoint",
 ]
 

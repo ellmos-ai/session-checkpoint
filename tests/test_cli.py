@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from session_checkpoint import cli as checkpoint_cli
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -168,3 +170,28 @@ def test_cli_export_import_round_trip(tmp_path):
     )
     assert result.returncode == 0
     assert applied["result"]["inserted"] == [1]
+
+
+def test_cli_import_rejects_input_larger_than_limit_without_parsing(
+    tmp_path, monkeypatch, capsys
+):
+    input_path = tmp_path / "oversized.json"
+    input_path.write_text(" " * 9 + "{}", encoding="utf-8")
+    monkeypatch.setattr(checkpoint_cli, "DEFAULT_MAX_IMPORT_FILE_BYTES", 8)
+
+    return_code = checkpoint_cli.main(
+        [
+            "import",
+            "--store",
+            str(tmp_path / "store.sqlite"),
+            "--input",
+            str(input_path),
+        ]
+    )
+
+    assert return_code == 1
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    payload = json.loads(captured.out)
+    assert payload["ok"] is False
+    assert "exceeds the 8-byte input limit" in payload["error"]

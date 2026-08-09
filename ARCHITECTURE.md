@@ -1,8 +1,8 @@
 # ARCHITECTURE.md — State and trust boundary
 
 **Version:** 0.1
-**Updated:** 2026-08-08
-**Reason:** Initial carrier architecture
+**Updated:** 2026-08-09
+**Reason:** Import-resource and sensitive-file hardening
 **Purpose:** Define ownership, data flow, invariants, and adapter seams.
 
 ## Data flow
@@ -21,6 +21,11 @@ The module owns one configured SQLite file and the tables `checkpoint_meta` and 
 It refuses an existing SQLite file with any other application tables. A namespace is required
 for every row-level operation, so one consumer cannot accidentally fetch or delete another
 consumer's row by numeric ID alone.
+
+New store and export files use owner-only POSIX mode bits. A compatible existing store is
+restricted only after its schema has passed validation, so the carrier does not change an
+unrelated SQLite file. Windows access control remains the containing directory's ACL because
+Python mode bits cannot express or replace a Windows ACL.
 
 ## Checkpoint record
 
@@ -46,6 +51,8 @@ authenticate an application or user.
 - Delete is a dry-run unless the caller explicitly applies it.
 - Import validates the entire bundle and checks all ID/source-reference conflicts before writing
   any row. Exact repeats are idempotent; differences fail closed.
+- Import rejects more than 1,000 records or more than 16 MiB of aggregate canonical payload by
+  default. The JSON CLI additionally reads at most 32 MiB from an import file.
 - Export/import preserve IDs and payload hashes so migration and rollback can be compared.
 
 ## Adapter seam
