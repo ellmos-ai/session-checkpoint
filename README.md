@@ -1,3 +1,5 @@
+<img src="assets/banner.png" width="100%" alt="session-checkpoint Banner">
+
 # session-checkpoint
 
 Local, application-neutral session checkpoint storage for Python and JSON-speaking tools.

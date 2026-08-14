@@ -1,3 +1,5 @@
+<img src="assets/banner.png" width="100%" alt="session-checkpoint Banner">
+
 # session-checkpoint
 
 Lokaler, anwendungsneutraler Speicher für Session-Checkpoints mit Python-API und JSON-CLI.
