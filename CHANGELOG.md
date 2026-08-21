@@ -5,7 +5,8 @@
 - Bounded create-payload files before JSON parsing while retaining the canonical payload limit.
 - Added pinned cross-platform CI, build validation, CLI smoke coverage, and non-uploading CodeQL
   analysis for the private readiness phase.
-- Added repository metadata and ignored ephemeral lock files.
+- Added repository metadata, a structured TODO status register, and the shared release-ignore
+  baseline including ephemeral lock files.
 
 ## 0.1.0 — 2026-08-08
 

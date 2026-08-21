@@ -61,6 +61,17 @@ def test_ci_workflows_pin_actions_and_keep_permissions_read_only():
     assert "upload: false" in codeql.read_text(encoding="utf-8")
 
 
-def test_ephemeral_lock_files_are_ignored():
+def test_release_hygiene_metadata_is_present():
     patterns = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
-    assert "LOCK*.txt" in patterns
+    required = {
+        "*.pyc",
+        ".env",
+        ".idea/",
+        ".vscode/",
+        "data/",
+        "LOCK*.txt",
+    }
+    assert required <= set(patterns)
+    todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
+    assert "## STATUS" in todo
+    assert "| Category | Status |" in todo

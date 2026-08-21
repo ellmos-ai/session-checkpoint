@@ -1,4 +1,5 @@
 __pycache__/
+*.pyc
 *.py[cod]
 .pytest_cache/
 .coverage
@@ -6,8 +7,12 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+.env
 .venv/
 venv/
+.idea/
+.vscode/
+data/
 *.sqlite
 *.sqlite3
 *.db
