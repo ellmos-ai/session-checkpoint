@@ -8,8 +8,9 @@ to the intended account; Python mode bits are not Windows ACLs. The package perf
 access.
 
 Imports are bounded by record count and aggregate canonical payload. The JSON CLI also bounds the
-input file before parsing. Applications may configure stricter core limits for their local risk
-and data shape.
+import file before parsing. Create-payload files are capped at 8 MiB before parsing and the
+canonical payload is capped at 1 MiB by default. Applications may configure stricter core limits
+for their local risk and data shape.
 
 SHA-256 verifies local payload integrity; it is not authentication or encryption. Applications
 that accept checkpoint bundles from another trust domain need their own authenticated transport

@@ -20,6 +20,8 @@ Lokaler, anwendungsneutraler Speicher für Session-Checkpoints mit Python-API un
 - Export und Import unterstützen spätere Migrations- und Rückwegtests.
 - Importe sind standardmäßig auf 1.000 Checkpoints, 16 MiB kanonische Gesamtnutzlast und bei der
   CLI auf eine 32 MiB große Eingabedatei begrenzt; Python-Aufrufer können strengere Grenzen setzen.
+- Nutzlastdateien für `create` werden oberhalb von 8 MiB bereits vor dem JSON-Parsing abgelehnt;
+  die kanonische Nutzlast bleibt standardmäßig auf 1 MiB begrenzt.
 
 ## Was das Modul bewusst nicht leistet
 
@@ -42,13 +44,13 @@ python -m pytest -q
 from session_checkpoint import CheckpointStore
 
 store = CheckpointStore("local-checkpoints.sqlite")
-checkpoint = store.create(
-    namespace="beispiel-app",
+created = store.create(
+    namespace="example-app",
     session_id="session-001",
-    name="vor-dem-update",
-    payload={"offene_punkte": [{"id": 1, "titel": "Synthetischer Eintrag"}]},
+    name="before-upgrade",
+    payload={"open_items": [{"id": 1, "title": "Synthetic item"}]},
 )
-geladen = store.get(checkpoint.id, namespace="beispiel-app")
+loaded = store.get(created.id, namespace="example-app")
 ```
 
 Die Nutzlast muss ein JSON-Objekt sein. Die Anwendung bestimmt dessen Inhalt und Bedeutung.
@@ -58,17 +60,17 @@ Die Nutzlast muss ein JSON-Objekt sein. Die Anwendung bestimmt dessen Inhalt und
 ```shell
 session-checkpoint create \
   --store local-checkpoints.sqlite \
-  --namespace beispiel-app \
+  --namespace example-app \
   --session-id session-001 \
-  --name vor-dem-update \
+  --name before-upgrade \
   --payload-file payload.json
 
-session-checkpoint list --store local-checkpoints.sqlite --namespace beispiel-app
-session-checkpoint get --store local-checkpoints.sqlite --namespace beispiel-app --id 1
+session-checkpoint list --store local-checkpoints.sqlite --namespace example-app
+session-checkpoint get --store local-checkpoints.sqlite --namespace example-app --id 1
 
-# Ohne --apply wird die Löschung nur geplant.
-session-checkpoint delete --store local-checkpoints.sqlite --namespace beispiel-app --id 1
-session-checkpoint delete --store local-checkpoints.sqlite --namespace beispiel-app --id 1 --apply
+# Deletion is only planned by default.
+session-checkpoint delete --store local-checkpoints.sqlite --namespace example-app --id 1
+session-checkpoint delete --store local-checkpoints.sqlite --namespace example-app --id 1 --apply
 ```
 
 Erwartete CLI-Fehler liefern Exit-Code 1 und ein JSON-Objekt auf stdout. Ein Export enthält

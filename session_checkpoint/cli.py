@@ -21,6 +21,9 @@ from .core import (
 )
 
 
+DEFAULT_MAX_PAYLOAD_FILE_BYTES = 8 * 1024 * 1024
+
+
 def _print(payload: Any) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
 
@@ -126,19 +129,25 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        if args.command == "create" and args.dry_run:
-            payload = _read_object(args.payload_file, label="payload-file")
-            prepared = prepare_checkpoint(
-                namespace=args.namespace,
-                session_id=args.session_id,
-                payload=payload,
-                name=args.name,
-                kind=args.kind,
-                created_at=args.created_at,
-                source_ref=args.source_ref,
+        create_payload: dict[str, Any] | None = None
+        if args.command == "create":
+            create_payload = _read_object(
+                args.payload_file,
+                label="payload-file",
+                max_bytes=DEFAULT_MAX_PAYLOAD_FILE_BYTES,
             )
-            _print({"ok": True, "result": {"dry_run": True, "plan": prepared.plan()}})
-            return 0
+            if args.dry_run:
+                prepared = prepare_checkpoint(
+                    namespace=args.namespace,
+                    session_id=args.session_id,
+                    payload=create_payload,
+                    name=args.name,
+                    kind=args.kind,
+                    created_at=args.created_at,
+                    source_ref=args.source_ref,
+                )
+                _print({"ok": True, "result": {"dry_run": True, "plan": prepared.plan()}})
+                return 0
 
         store = CheckpointStore(args.store)
         if args.command == "init":
@@ -147,11 +156,11 @@ def main(argv: list[str] | None = None) -> int:
                 "schema_version": SCHEMA_VERSION,
             }
         elif args.command == "create":
-            payload = _read_object(args.payload_file, label="payload-file")
+            assert create_payload is not None
             result = store.create(
                 namespace=args.namespace,
                 session_id=args.session_id,
-                payload=payload,
+                payload=create_payload,
                 name=args.name,
                 kind=args.kind,
                 created_at=args.created_at,

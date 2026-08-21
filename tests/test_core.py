@@ -212,7 +212,7 @@ def test_import_rejects_duplicate_source_references_before_writing(tmp_path):
         payload={"value": "first"},
         source_ref="legacy:1",
     )
-    second = source.create(
+    source.create(
         namespace="bach",
         session_id="session-002",
         payload={"value": "second"},

@@ -18,6 +18,8 @@ Local, application-neutral session checkpoint storage for Python and JSON-speaki
 - Exports and imports complete local checkpoint sets for migration and rollback tests.
 - Bounds imports to 1,000 checkpoints, 16 MiB aggregate canonical payload, and a 32 MiB CLI
   input file by default; Python callers can choose stricter carrier limits.
+- Rejects create-payload files above 8 MiB before JSON parsing; the canonical payload remains
+  limited to 1 MiB by default.
 
 ## What it does not do
 

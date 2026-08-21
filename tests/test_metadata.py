@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 
@@ -41,3 +42,25 @@ def test_german_readme_uses_real_umlauts_without_mojibake():
     assert "für" in text
     assert "Löschung" in text
     assert not any(marker in text for marker in ("Ã", "Â", "â€", "�"))
+
+
+def test_ci_workflows_pin_actions_and_keep_permissions_read_only():
+    workflows = sorted((ROOT / ".github" / "workflows").glob("*.yml"))
+    assert {path.name for path in workflows} == {"ci.yml", "codeql.yml"}
+    for path in workflows:
+        text = path.read_text(encoding="utf-8")
+        assert "contents: read" in text
+        for line in text.splitlines():
+            if "uses:" not in line:
+                continue
+            reference = line.split("uses:", 1)[1].strip().split()[0]
+            assert re.fullmatch(r"[^@\s]+@[0-9a-f]{40}", reference), (
+                f"Unpinned action in {path.name}: {reference}"
+            )
+    codeql = next(path for path in workflows if path.name == "codeql.yml")
+    assert "upload: false" in codeql.read_text(encoding="utf-8")
+
+
+def test_ephemeral_lock_files_are_ignored():
+    patterns = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert "LOCK*.txt" in patterns

@@ -12,3 +12,4 @@ venv/
 *.sqlite3
 *.db
 *.tmp
+LOCK*.txt

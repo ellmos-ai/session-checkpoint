@@ -130,6 +130,35 @@ def test_cli_scalar_payload_is_json_error_without_traceback(tmp_path):
     assert "JSON object" in payload["error"]
 
 
+def test_cli_create_rejects_payload_file_larger_than_limit_without_parsing(
+    tmp_path, monkeypatch, capsys
+):
+    payload_path = tmp_path / "oversized.json"
+    payload_path.write_text(" " * 9 + "{}", encoding="utf-8")
+    monkeypatch.setattr(checkpoint_cli, "DEFAULT_MAX_PAYLOAD_FILE_BYTES", 8)
+    store_path = tmp_path / "store.sqlite"
+
+    return_code = checkpoint_cli.main(
+        [
+            "create",
+            "--store",
+            str(store_path),
+            "--session-id",
+            "session-001",
+            "--payload-file",
+            str(payload_path),
+        ]
+    )
+
+    assert return_code == 1
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    payload = json.loads(captured.out)
+    assert payload["ok"] is False
+    assert "exceeds the 8-byte input limit" in payload["error"]
+    assert not store_path.exists()
+
+
 def test_cli_export_import_round_trip(tmp_path):
     source = tmp_path / "source.sqlite"
     target = tmp_path / "target.sqlite"
