@@ -55,5 +55,12 @@ owner-only POSIX mode bits and rechecked after atomic replacement. On Windows, t
 on the containing directory's ACL and documents that boundary rather than claiming that
 `os.chmod` configures Windows security descriptors.
 
+## ADR-008: MIT licence, with publication still gated
+
+The owner selected the MIT licence on 2026-08-22. The licence and package metadata therefore use
+SPDX identifier `MIT`. This decision permits later distribution but does not make the repository
+public, publish a package, create a tag, or satisfy the remaining integration and release gates in
+`PRIVATE.txt`.
+
 ---
 <!-- REMEMBER: ENDUSERTEXTE BEKOMMEN ECHTE UMLAUTE Ü Ö Ä -->

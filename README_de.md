@@ -83,7 +83,8 @@ Windows-ACL konfigurieren.
 ## Stand und Freigabe
 
 Version 0.1.0 ist ein privater Integrationsstand. Maßgeblich sind `STATE.md`, `ARCHITECTURE.md`
-und `PRIVATE.txt`. Eine Lizenz oder öffentliche Paketfreigabe wurde noch nicht entschieden.
+und `PRIVATE.txt`. Der User hat am 22.08.2026 die MIT-Lizenz gewählt; das Repository bleibt
+privat, und eine öffentliche Paketfreigabe wurde nicht erteilt.
 
 ---
 <!-- REMEMBER: ENDUSERTEXTE BEKOMMEN ECHTE UMLAUTE Ü Ö Ä -->

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import tomllib
 from pathlib import Path
 
 
@@ -75,3 +76,19 @@ def test_release_hygiene_metadata_is_present():
     todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
     assert "## STATUS" in todo
     assert "| Category | Status |" in todo
+
+
+def test_mit_license_metadata_is_consistent():
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    assert project["license"] == "MIT"
+    assert project["license-files"] == ["LICENSE"]
+
+    licence = (ROOT / "LICENSE").read_text(encoding="utf-8")
+    assert licence.startswith("MIT License\n")
+    assert "Copyright (c) 2026 Lukas Geiger" in licence
+    assert "public package release has been approved" in (ROOT / "README.md").read_text(
+        encoding="utf-8"
+    )
+    assert "öffentliche Paketfreigabe wurde nicht erteilt" in (
+        ROOT / "README_de.md"
+    ).read_text(encoding="utf-8")

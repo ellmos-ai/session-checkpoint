@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added the owner-selected MIT licence and aligned package and release-gate metadata; publication
+  remains separately gated.
 - Bounded create-payload files before JSON parsing while retaining the canonical payload limit.
 - Added pinned cross-platform CI, build validation, CLI smoke coverage, and non-uploading CodeQL
   analysis for the private readiness phase.
