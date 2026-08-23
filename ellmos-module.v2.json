@@ -25,7 +25,7 @@
     "python": "session_checkpoint.CheckpointStore"
   },
   "boundaries": {
-    "data": "application-defined-sensitive",
+    "data": "sensitive",
     "network": "none",
     "platforms": [
       "windows",
@@ -34,7 +34,7 @@
     ]
   },
   "state": {
-    "location": "user-configurable-local",
+    "location": "external",
     "ownership": "module"
   },
   "source_of_truth": {
