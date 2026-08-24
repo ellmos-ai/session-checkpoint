@@ -1,0 +1,110 @@
+# session-checkpoint
+
+> Local, application-neutral session checkpoint storage with integrity verification and reversible export/import for Python applications and JSON CLI tooling.
+
+- Last-checked: 2026-08-24
+- Version: 0.1.0
+- Module status: `development`; visibility projection: `private`; release gate: `LOCKED`.
+- Architecture: Local-First / Zero-Dependency / SQLite-backed Checkpoint Store
+- Module Family: ellmos runtime infrastructure (`runtime.library`, `session.checkpoint`)
+- Repository: [ellmos-ai/session-checkpoint](https://github.com/ellmos-ai/session-checkpoint)
+
+## System Overview
+
+`session-checkpoint` is a zero-dependency Python 3.10+ library and JSON-speaking CLI for storing, loading, verifying, and migrating application-provided session checkpoint payloads in dedicated local SQLite databases. It enforces strict boundary separation: the carrier provides reliable persistence, payload canonicalization, cryptographic SHA-256 integrity verification, and namespace isolation without inspecting or altering application semantics.
+
+## Key Invariants & Features
+
+1. **Zero External Dependencies**: Core package uses Python 3.10+ standard library (`sqlite3`, `hashlib`, `json`, `pathlib`).
+2. **Canonical Payload Hashing**: Checkpoint payloads (must be JSON objects) are formatted deterministically (sorted keys, compact separators, UTF-8 encoded) and verified against a stored SHA-256 digest on every read.
+3. **Fail-Closed Integrity**: Any corrupted payload, altered hash, or schema mismatch raises explicit integrity errors (`CheckpointIntegrityError`) and aborts immediately.
+4. **Namespace Isolation**: Multiple applications can share a store or maintain dedicated stores; source references prevent collision during import/migration.
+5. **Conservative Mutation**: Deletions and imports default to planning (dry-run); live mutations require explicit `--apply` flags or method arguments.
+6. **Bounded Resource Limits**:
+   - Default max single payload size: 1 MiB (pre-parse CLI limit: 8 MiB).
+   - Default import limits: 1,000 checkpoints, 16 MiB aggregate payload (pre-parse CLI import limit: 32 MiB).
+7. **POSIX Owner-Only Security & Windows Path Hygiene**: Restricts store/export file permissions on POSIX systems (0600 mode bits); rejects directory traversal and PII/host leaks.
+
+## CLI Reference
+
+```bash
+# Create a checkpoint
+session-checkpoint create \
+  --store local-checkpoints.sqlite \
+  --namespace example-app \
+  --session-id session-001 \
+  --name before-upgrade \
+  --payload-file payload.json
+
+# Dry-run creation check (does not create or modify store)
+session-checkpoint create \
+  --store local-checkpoints.sqlite \
+  --namespace example-app \
+  --session-id session-001 \
+  --name test \
+  --payload-file payload.json \
+  --dry-run
+
+# List checkpoints in a namespace
+session-checkpoint list --store local-checkpoints.sqlite --namespace example-app
+
+# Get a specific checkpoint by ID
+session-checkpoint get --store local-checkpoints.sqlite --namespace example-app --id 1
+
+# Plan deletion (dry-run by default)
+session-checkpoint delete --store local-checkpoints.sqlite --namespace example-app --id 1
+
+# Execute deletion
+session-checkpoint delete --store local-checkpoints.sqlite --namespace example-app --id 1 --apply
+
+# Export checkpoints to JSON
+session-checkpoint export --store local-checkpoints.sqlite --namespace example-app --output export.json
+
+# Import checkpoints from JSON (dry-run by default)
+session-checkpoint import --store local-checkpoints.sqlite --namespace example-app --input export.json
+
+# Execute import
+session-checkpoint import --store local-checkpoints.sqlite --namespace example-app --input export.json --apply
+```
+
+## Python API Reference
+
+```python
+from session_checkpoint import CheckpointStore
+
+# Initialize or connect to checkpoint store
+store = CheckpointStore("local-checkpoints.sqlite")
+
+# Create a new checkpoint
+record = store.create(
+    namespace="agent-workspace",
+    session_id="sess-2026-08-24",
+    name="pre-compaction",
+    payload={"state": "active", "step": 42, "tokens": 12850},
+)
+print(f"Created checkpoint ID {record.id} with hash {record.payload_sha256}")
+
+# Retrieve and verify checkpoint
+checkpoint = store.get(record.id, namespace="agent-workspace")
+assert checkpoint.payload["step"] == 42
+
+# List checkpoints with optional filtering
+history = store.list(namespace="agent-workspace", session_id="sess-2026-08-24")
+
+# Delete checkpoint (apply=True required for actual deletion)
+store.delete(record.id, namespace="agent-workspace", apply=True)
+```
+
+## Recommended Search Phrases
+
+- `session checkpoint storage python sqlite`
+- `local-first session persistence integrity check`
+- `sha256 verified json checkpoint store`
+- `zero-dependency session migration carrier`
+- `ellmos runtime session checkpoint`
+
+## Repository & Ecosystem Links
+
+- **Repository**: [ellmos-ai/session-checkpoint](https://github.com/ellmos-ai/session-checkpoint)
+- **Ecosystem Catalog**: [ellmos-ai/stacks](https://github.com/ellmos-ai/stacks)
+- **Organization**: [ellmos-ai](https://github.com/ellmos-ai)

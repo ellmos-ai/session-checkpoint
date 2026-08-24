@@ -96,3 +96,32 @@ def test_mit_license_metadata_is_consistent():
     assert "öffentliche Paketfreigabe wurde nicht erteilt" in (
         ROOT / "README_de.md"
     ).read_text(encoding="utf-8")
+
+
+def test_llms_txt_is_present_and_consistent():
+    llms_path = ROOT / "llms.txt"
+    assert llms_path.is_file(), "llms.txt must exist"
+    text = llms_path.read_text(encoding="utf-8")
+    assert "# session-checkpoint" in text
+    assert "- Last-checked: 2026-08-24" in text
+    assert "## System Overview" in text
+    assert "## Key Invariants & Features" in text
+    assert "## CLI Reference" in text
+    assert "## Python API Reference" in text
+    manifest = json.loads((ROOT / "ellmos-module.v2.json").read_text(encoding="utf-8"))
+    assert f"- Version: {manifest['version']}" in text
+
+
+def test_packaging_and_pep621_classifiers():
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    assert "classifiers" in project
+    classifiers = set(project["classifiers"])
+    assert "License :: OSI Approved :: MIT License" in classifiers
+    assert "Operating System :: OS Independent" in classifiers
+    assert "Programming Language :: Python :: 3" in classifiers
+    assert "Programming Language :: Python :: 3.10" in classifiers
+    assert "Programming Language :: Python :: 3.11" in classifiers
+    assert "Programming Language :: Python :: 3.12" in classifiers
+    assert "Programming Language :: Python :: 3.13" in classifiers
+    assert "Homepage" in project.get("urls", {})
+

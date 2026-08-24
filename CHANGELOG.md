@@ -1,15 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 — 2026-08-24
 
-- Added the owner-selected MIT licence and aligned package and release-gate metadata; publication
-  remains separately gated.
-- Kept metadata checks compatible with supported Python 3.10 via the conditional `tomli` fallback.
-- Bounded create-payload files before JSON parsing while retaining the canonical payload limit.
-- Added pinned cross-platform CI, build validation, CLI smoke coverage, and non-uploading CodeQL
-  analysis for the private readiness phase.
-- Added repository metadata, a structured TODO status register, and the shared release-ignore
-  baseline including ephemeral lock files.
+- Added `llms.txt` documenting system invariants, CLI commands, and Python API for AI discoverability.
+- Added standard PEP 621 metadata classifiers and homepage URL in `pyproject.toml`.
+- Expanded automated metadata test suite (`tests/test_metadata.py`) to verify `llms.txt` and packaging standards.
+- Added Plan-D pointer and aligned repository mirror parity with `.TOPICS/.AI/.MODULES/.RUNTIME`.
 
 ## 0.1.0 — 2026-08-08
 

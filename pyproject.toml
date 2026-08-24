@@ -12,6 +12,19 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "ellmos-ai contributors" }]
 keywords = ["session", "checkpoint", "sqlite", "local-first"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Database",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = []
 
 [project.optional-dependencies]
@@ -24,6 +37,7 @@ dev = [
 ]
 
 [project.urls]
+Homepage = "https://github.com/ellmos-ai/session-checkpoint"
 Repository = "https://github.com/ellmos-ai/session-checkpoint"
 Issues = "https://github.com/ellmos-ai/session-checkpoint/issues"
 
