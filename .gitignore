@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
 build/
 dist/
@@ -17,4 +18,23 @@ data/
 *.sqlite3
 *.db
 *.tmp
+LOCK
+LOCK.*
 LOCK*.txt
+*conflicted copy*
+* (Kopie)*
+* (Copy)*
+*-ASUS*
+*-ASUS-GEI*
+*-LAPTOP*
+*-WORKSTATION*
+*-WORKSTATION-LG*
+*-Mac Studio*
+*-MacBook*
+*.orig
+*.rej
+uv.lock
+!package-lock.json
+.hypothesis/
+.turbo/
+.nyc_output/

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "session-checkpoint"
-version = "0.1.0"
+version = "0.1.1"
 description = "Local, application-neutral session checkpoint storage with integrity checks."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -38,8 +38,10 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/ellmos-ai/session-checkpoint"
+Documentation = "https://github.com/ellmos-ai/session-checkpoint#readme"
 Repository = "https://github.com/ellmos-ai/session-checkpoint"
 Issues = "https://github.com/ellmos-ai/session-checkpoint/issues"
+Changelog = "https://github.com/ellmos-ai/session-checkpoint/blob/main/CHANGELOG.md"
 
 [project.scripts]
 session-checkpoint = "session_checkpoint.cli:main"
@@ -48,8 +50,11 @@ session-checkpoint = "session_checkpoint.cli:main"
 include = ["session_checkpoint*"]
 
 [tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q"
 pythonpath = "."
 testpaths = ["tests"]
+norecursedirs = [".git", ".pytest_cache", "__pycache__", "build", "dist", "*.egg-info"]
 
 [tool.ruff]
 target-version = "py310"

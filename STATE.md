@@ -1,16 +1,16 @@
 ---
 name: "session-checkpoint-state"
 type: project-state
-version: 0.1.0
-updated: 2026-08-21
-last_verified: 2026-08-21
+version: 0.1.1
+updated: 2026-09-18
+last_verified: 2026-09-18
 description: "Current verified project state and claim boundary."
 ---
 
 # STATE.md — Current state
 
-**Version:** 0.1
-**Updated:** 2026-08-21
+**Version:** 0.1.1
+**Updated:** 2026-09-18
 **Reason:** Private public-readiness and bounded create-input hardening
 **Purpose:** State what exists, what is proven, and what remains open.
 

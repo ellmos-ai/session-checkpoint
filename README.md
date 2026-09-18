@@ -79,6 +79,6 @@ Python mode bits do not configure Windows ACLs.
 
 ## Status and release
 
-Version 0.1.0 is a private integration build. See `STATE.md`, `ARCHITECTURE.md`, and
+Version 0.1.1 is a private integration build. See `STATE.md`, `ARCHITECTURE.md`, and
 `PRIVATE.txt`. The owner selected the MIT licence on 2026-08-22; the repository remains private,
 and no public package release has been approved.

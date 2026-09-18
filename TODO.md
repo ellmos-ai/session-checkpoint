@@ -1,8 +1,8 @@
 # TODO.md — Active work
 
 **Version:** 0.1.1
-**Updated:** 2026-08-24
-**Reason:** AI Modules Care routine audit & metadata parity
+**Updated:** 2026-09-18
+**Reason:** Path A repository hygiene, CI hardening, PEP 621 metadata, and contract test expansion
 **Purpose:** Track only work that remains open.
 
 ## STATUS

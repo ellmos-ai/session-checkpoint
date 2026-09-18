@@ -1,16 +1,16 @@
 ---
 name: "session-checkpoint-start"
 type: session-bootstrap
-version: 0.1.0
-updated: 2026-08-08
-last_verified: 2026-08-08
+version: 0.1.1
+updated: 2026-09-18
+last_verified: 2026-09-18
 description: "Bootstrap sequence for work on session-checkpoint."
 ---
 
 # START.md — Session bootstrap
 
-**Version:** 0.1
-**Updated:** 2026-08-08
+**Version:** 0.1.1
+**Updated:** 2026-09-18
 **Reason:** Initial project setup
 **Purpose:** Define the shortest safe entry into the project.
 

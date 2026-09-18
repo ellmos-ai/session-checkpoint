@@ -2,7 +2,7 @@
   "schema": "ellmos.module.v2",
   "id": "session-checkpoint",
   "display_name": "session-checkpoint",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "development",
   "visibility": "private",
   "category": "runtime",

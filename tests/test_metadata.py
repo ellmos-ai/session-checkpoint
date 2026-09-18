@@ -55,6 +55,7 @@ def test_ci_workflows_pin_actions_and_keep_permissions_read_only():
     for path in workflows:
         text = path.read_text(encoding="utf-8")
         assert "contents: read" in text
+        assert "cancel-in-progress: true" in text
         for line in text.splitlines():
             if "uses:" not in line:
                 continue
@@ -75,6 +76,9 @@ def test_release_hygiene_metadata_is_present():
         ".vscode/",
         "data/",
         "LOCK*.txt",
+        "*conflicted copy*",
+        "LOCK.*",
+        "uv.lock",
     }
     assert required <= set(patterns)
     todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
@@ -103,7 +107,7 @@ def test_llms_txt_is_present_and_consistent():
     assert llms_path.is_file(), "llms.txt must exist"
     text = llms_path.read_text(encoding="utf-8")
     assert "# session-checkpoint" in text
-    assert "- Last-checked: 2026-08-24" in text
+    assert "- Last-checked: 2026-09-18" in text
     assert "## System Overview" in text
     assert "## Key Invariants & Features" in text
     assert "## CLI Reference" in text
@@ -123,5 +127,37 @@ def test_packaging_and_pep621_classifiers():
     assert "Programming Language :: Python :: 3.11" in classifiers
     assert "Programming Language :: Python :: 3.12" in classifiers
     assert "Programming Language :: Python :: 3.13" in classifiers
-    assert "Homepage" in project.get("urls", {})
+    urls = project.get("urls", {})
+    assert "Homepage" in urls
+    assert "Repository" in urls
+    assert "Issues" in urls
+    assert "Documentation" in urls
+    assert "Changelog" in urls
 
+
+def test_pytest_ini_options_guardrails():
+    cfg = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    ini = cfg.get("tool", {}).get("pytest", {}).get("ini_options", {})
+    assert ini.get("minversion") == "7.0"
+    norecursedirs = set(ini.get("norecursedirs", []))
+    assert {".git", ".pytest_cache", "__pycache__"} <= norecursedirs
+
+
+def test_version_consistency_across_manifests():
+    import session_checkpoint
+
+    pyproject_version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+        "project"
+    ]["version"]
+    manifest_version = json.loads((ROOT / "ellmos-module.v2.json").read_text(encoding="utf-8"))[
+        "version"
+    ]
+    pkg_version = session_checkpoint.__version__
+    llms_text = (ROOT / "llms.txt").read_text(encoding="utf-8")
+    changelog_text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+
+    assert pyproject_version == "0.1.1"
+    assert manifest_version == "0.1.1"
+    assert pkg_version == "0.1.1"
+    assert f"- Version: {pyproject_version}" in llms_text
+    assert f"## {pyproject_version} —" in changelog_text

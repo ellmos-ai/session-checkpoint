@@ -1,11 +1,11 @@
 ---
 name: "session-checkpoint"
 type: project-docs
-version: 0.1.0
+version: 0.1.1
 created: "2026-08-08"
-updated: "2026-08-08"
-reason_last_change: "Initial private carrier extracted from the open-ocean K9 session-checkpoint gap"
-last_verified: "2026-08-08"
+updated: "2026-09-18"
+reason_last_change: "Path A repository hygiene, CI hardening, PEP 621 metadata, and contract test expansion"
+last_verified: "2026-09-18"
 author: "Lukas Geiger / ellmos-ai contributors"
 description: |
   Agent instructions for the application-neutral session checkpoint carrier.
@@ -13,8 +13,8 @@ description: |
 
 # CLAUDE.md — Project instructions
 
-**Version:** 0.1
-**Updated:** 2026-08-08
+**Version:** 0.1.1
+**Updated:** 2026-09-18
 **Reason:** Initial private carrier implementation
 **Purpose:** Preserve the narrow state, privacy, and compatibility boundary of this module.
 

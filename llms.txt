@@ -2,8 +2,8 @@
 
 > Local, application-neutral session checkpoint storage with integrity verification and reversible export/import for Python applications and JSON CLI tooling.
 
-- Last-checked: 2026-08-24
-- Version: 0.1.0
+- Last-checked: 2026-09-18
+- Version: 0.1.1
 - Module status: `development`; visibility projection: `private`; release gate: `LOCKED`.
 - Architecture: Local-First / Zero-Dependency / SQLite-backed Checkpoint Store
 - Module Family: ellmos runtime infrastructure (`runtime.library`, `session.checkpoint`)
