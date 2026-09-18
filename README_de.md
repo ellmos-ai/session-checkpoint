@@ -6,9 +6,6 @@ Lokaler, anwendungsneutraler Speicher für Session-Checkpoints mit Python-API un
 
 *[English](README.md)*
 
-> **Privater Aufbau.** Dieser Träger schließt die Session-Checkpoint-Lücke aus open-oceans K9-
-> Roadmap. Er bleibt privat und unveröffentlicht, solange Integration und Freigabe offen sind.
-
 ## Was das Modul leistet
 
 - Es speichert von einer Anwendung gelieferte Checkpoint-Nutzlasten in einer eigenen lokalen
@@ -82,9 +79,7 @@ Windows-ACL konfigurieren.
 
 ## Stand und Freigabe
 
-Version 0.1.1 ist ein privater Integrationsstand. Maßgeblich sind `STATE.md`, `ARCHITECTURE.md`
-und `PRIVATE.txt`. Der User hat am 22.08.2026 die MIT-Lizenz gewählt; das Repository bleibt
-privat, und eine öffentliche Paketfreigabe wurde nicht erteilt.
+Version 0.1.1 ist unter der MIT-Lizenz veröffentlicht. Maßgeblich sind `STATE.md` und `ARCHITECTURE.md`.
 
 ---
 <!-- REMEMBER: ENDUSERTEXTE BEKOMMEN ECHTE UMLAUTE Ü Ö Ä -->
