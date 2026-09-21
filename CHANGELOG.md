@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Reject imported checkpoint IDs above \(2^{62} - 1\) before any SQLite lookup or write, preserving
+  allocator headroom and preventing a one-record bundle from permanently blocking later creates.
+
 ## 0.1.1 — 2026-09-18
 
 - Added CI workflow concurrency controls with `cancel-in-progress: true` (`ci.yml`, `codeql.yml`).

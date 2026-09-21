@@ -288,6 +288,38 @@ def test_import_rejects_aggregate_payload_bytes_before_writing(tmp_path):
     assert applied["inserted"] == [1, 2]
 
 
+@pytest.mark.parametrize("checkpoint_id", [1 << 62, (1 << 63) - 1, 1 << 63])
+def test_import_rejects_ids_that_can_exhaust_sqlite_autoincrement(
+    tmp_path, checkpoint_id
+):
+    source = CheckpointStore(tmp_path / "source.sqlite")
+    source.create(namespace="test", session_id="session-001", payload={"value": 1})
+    bundle = source.export_bundle()
+    bundle["checkpoints"][0]["id"] = checkpoint_id
+
+    target = CheckpointStore(tmp_path / "target.sqlite")
+    with pytest.raises(CheckpointValidationError, match="safe import limit"):
+        target.import_bundle(bundle, dry_run=False)
+
+    assert target.list(namespace="test") == []
+    assert target.create(
+        namespace="test", session_id="after-rejection", payload={"safe": True}
+    ).id == 1
+
+
+def test_import_accepts_safe_id_boundary_and_preserves_allocator_headroom(tmp_path):
+    source = CheckpointStore(tmp_path / "source.sqlite")
+    source.create(namespace="test", session_id="session-001", payload={"value": 1})
+    bundle = source.export_bundle()
+    bundle["checkpoints"][0]["id"] = (1 << 62) - 1
+
+    target = CheckpointStore(tmp_path / "target.sqlite")
+    assert target.import_bundle(bundle, dry_run=False)["inserted"] == [(1 << 62) - 1]
+    assert target.create(
+        namespace="test", session_id="after-boundary", payload={"safe": True}
+    ).id == 1 << 62
+
+
 @pytest.mark.skipif(os.name != "posix", reason="POSIX mode bits are not Windows ACLs")
 def test_store_and_export_are_private_files_on_posix(tmp_path):
     from session_checkpoint.cli import _atomic_json_write
