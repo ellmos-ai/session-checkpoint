@@ -1,0 +1,111 @@
+# MARKETING-LOG: session-checkpoint
+Date: 2026-09-22
+Operator: Antigravity / Gemini (via GITHUBBOT Pfad B)
+Target Repo: ellmos-ai/session-checkpoint
+Canonical Path: C:\_Local_DEV\repos\session-checkpoint
+Version: 0.1.1 (Frozen per T-20260920-167562623)
+
+# Audit & Action Tracking:
+# [2026-08-08 12:00:00 CEST] [RELEASE] ACTION: INITIAL_CARRIER_RELEASE | REPO: ellmos-ai/session-checkpoint | SCOPE: Initial carrier release v0.1.0 with SQLite store, canonical JSON hashing, namespace segregation, bounded imports, and private release gate.
+# [2026-09-18 14:30:00 CEST] [CHORE] ACTION: HYGIENE_HARDENING | REPO: ellmos-ai/session-checkpoint | SCOPE: Release v0.1.1 with CI concurrency controls, hardened Pytest configuration, PEP 621 URLs, .gitignore cloud sync guards, and metadata contract tests.
+# [2026-09-22 11:55:00 CEST] [GITHUBBOT_ONE_REPO_MARKETING_AND_DESIGN] ACTION: PFAD_B_UPGRADE | REPO: ellmos-ai/session-checkpoint | SCOPE: Full Pfad B discoverability baseline: 18-point bilingual quick navigation architecture (README.md & README_de.md) with reciprocal dual HTML anchors (<a id="sec-01">..sec-18), dual Mermaid diagrams (4-tier architecture trust boundary flowchart TD and end-to-end checkpoint lifecycle sequenceDiagram with autonumber and zero semicolons), 10 runtime invariants (INV-LOCAL-01..INV-SLA-10), Level 1 SBOM Drittanbieter-Lizenzen in THIRD_PARTY_LICENSES.md (zero mandatory runtime dependencies, PSF-2.0 stdlib), canonical root NOTICE attribution file (Lukas Geiger, ellmos-ai, open-bricks), statutory § 521 BGB disclaimer and 48h Security Response SLA in SECURITY.md, 10-dimension comparative matrix, structured personas [PERSONA-01]..[PERSONA-04], 20/20 GitHub topics saturation, and expanded contract test suite in tests/test_metadata.py (16 contract tests, 30 passed in full suite).
+
+================================================================================
+1. REPOSITORY AUDIT & DISCOVERABILITY BASELINE
+================================================================================
+- Organization: ellmos-ai
+- Umbrella Ecosystem: open-bricks
+- Primary Category: Developer Tooling / State Management / Local Storage Carrier
+- Core Positioning: Local, application-neutral session checkpoint storage carrier with cryptographic SHA-256 integrity verification, fail-closed corruption defense, and reversible migration bundles for Python applications and JSON CLI tooling.
+- Distinct Value Proposition: Operates 100% offline with zero external runtime dependencies (pure Python standard library core `sqlite3`, `hashlib`, `json`, `pathlib`). Enforces canonical JSON payload hashing, strict namespace segregation, conservative dry-run-first mutations, owner-only POSIX file permissions (0600 mode bits), and bounded memory and file limits.
+- Sibling Ecosystem Integration: Interoperates directly with ellmos-ai infrastructure (stacks, lock-master, ticket-master, ellmos-filecommander-mcp, ellmos-codecommander-mcp, memoryhooker), dev-bricks developer tooling (safe-start-for-codex, CareCenter-for-Codex), and the open-bricks root ecosystem.
+
+================================================================================
+2. TARGET PERSONAS & USER JOURNEYS
+================================================================================
+1. [PERSONA-01] Local AI Agent & Assistant Engineers (Claude Code, Antigravity, OpenAI Codex, Open-WebUI)
+   - Needs: Run multi-step agentic workflows where agents generate tool calls, analyze code, and compact context, requiring safe local restore points between reasoning loops without leaking sensitive local file context to external cloud services.
+   - Pain Points: Ad-hoc JSON dumps fail to verify data integrity, leading to silent prompt corruption; external cloud key-value stores violate privacy constraints and introduce network latency.
+   - Solution: `session-checkpoint` provides an air-gapped local SQLite carrier with automatic canonical SHA-256 validation on every read. Machine-readable context in `llms.txt` enables local LLMs to invoke and inspect gating status natively.
+
+2. [PERSONA-02] Desktop & GUI Application Developers (PySide6, PyQt, Tkinter, Electron)
+   - Needs: Preserve session state (e.g. open documents, window geometry, active work tabs) across application restarts and unexpected operating system reboots.
+   - Pain Points: Designing custom relational database schemas for session state introduces overhead; raw file saving risks corrupted files upon sudden power loss.
+   - Solution: Lightweight Python API (`CheckpointStore`) provides ACID transaction guarantees via SQLite with zero background daemons.
+
+3. [PERSONA-03] CLI Tool & Pipeline Automation Authors
+   - Needs: Multi-stage ETL pipelines and batch processing scripts needing structured checkpoint history, repeatable dry-run deletion, and portable JSON migration bundles.
+   - Pain Points: Shell scripts dumping files into temporary directories lack atomic rollback verification and namespace isolation.
+   - Solution: Deterministic JSON-only CLI (`session-checkpoint`) with structured error codes, standard dry-run planning, and portable export/import commands.
+
+4. [PERSONA-04] Security & Compliance-Conscious Teams
+   - Needs: Developer tooling that guarantees zero data egress, unprivileged user execution, and strictly bounded memory and disk allocations.
+   - Pain Points: Complex dependencies often introduce hidden network telemetry or security vulnerabilities.
+   - Solution: 100% Local-First / Zero-Egress (INV-LOCAL-01), strictly unprivileged execution without UAC (INV-SEC-02), zero external runtime dependencies, 100% permissive open-source license audit (THIRD_PARTY_LICENSES.md), and codified 48-hour security response SLA (INV-SLA-10).
+
+================================================================================
+3. HIGH-INTENT SEARCH QUERIES (BILINGUAL EN & DE)
+================================================================================
+English (EN):
+- `session checkpoint storage python sqlite`
+- `local first session persistence sha256`
+- `zero dependency json checkpoint storage python`
+- `ai agent state checkpointing sqlite`
+- `fail closed session store integrity verification`
+- `application neutral session state carrier`
+- `python sqlite json payload hashing`
+- `ellmos runtime session checkpoint`
+
+German (DE):
+- `python session checkpoint speicher sqlite`
+- `lokale sitzungsspeicherung sha256 integritaet`
+- `abheangigkeitsfreie json checkpoint verwaltung`
+- `ki agenten zustandssicherung sqlite`
+- `fail-closed checkpoint speicher python`
+- `anwendungsneutraler session speichertraeger`
+
+================================================================================
+4. 10-DIMENSION COMPARATIVE MATRIX VS. ALTERNATIVES
+================================================================================
+| Feature / Dimension | session-checkpoint | Full SQLite DB Backup | Ad-Hoc DB Tables | Raw JSON Files | Cloud KV Stores (Redis/S3) |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| Zero External Dependencies | YES (stdlib only) | YES | YES | YES | NO (requires clients) |
+| Cryptographic Hash on Read | YES (SHA-256) | NO | NO | NO | NO |
+| Fail-Closed Tamper Guard | YES | NO | NO | NO | NO |
+| Application Neutrality | YES (Carrier) | NO (full schema) | NO (tight coupling) | Partial | Partial |
+| Strict Namespace Isolation | YES (Mandatory) | NO | Manual | Manual | Keyspace prefixes |
+| Dry-Run Mutation Safety | YES (Default) | NO | NO | NO | NO |
+| Enforced Size & Record Caps | YES (Bounded) | NO | NO | NO | Cloud quota dependent |
+| Reversible Portable Export | YES (Atomic JSON) | NO (.db copy) | Custom scripts | Manual | Custom dumps |
+| Zero Network Egress (Local) | YES (Air-Gapped) | YES | YES | YES | NO (Network required) |
+| User-Mode Execution (RunAsInvoker) | YES | YES | YES | YES | Cloud auth required |
+
+================================================================================
+5. GOVERNANCE & 10 RUNTIME INVARIANTS CROSS-REFERENCE
+================================================================================
+- INV-LOCAL-01: 100% Local-First Storage (Zero Egress)
+- INV-CANON-02: Deterministic Canonical JSON Hashing
+- INV-FAILCLOSE-03: Fail-Closed Cryptographic Verification
+- INV-BOUNDARY-04: Application Boundary Isolation
+- INV-NAMESP-05: Strict Namespace Segregation
+- INV-LIMITS-06: Enforced Resource Caps (1 MiB payload / 16 MiB import)
+- INV-DRYRUN-07: Conservative Mutation (Dry-Run by Default)
+- INV-PERM-08: POSIX Least-Privilege (0600) & Windows ACL Hygiene
+- INV-REVERSIBLE-09: Reversible Portable Migration Bundles
+- INV-SLA-10: RunAsInvoker & 48h Security Response SLA
+
+================================================================================
+6. LEVEL 1 SBOM & LICENSE AUDIT
+================================================================================
+- Runtime Dependencies: 0 (100% Python Standard Library PSF-2.0)
+- Core License: MIT License (Copyright 2026 Lukas Geiger)
+- Statutory Disclaimer: § 521 BGB (Schenkungshaftung) documented in NOTICE
+- Security Policy: 48h SLA documented in SECURITY.md
+- SBOM: THIRD_PARTY_LICENSES.md Stand 2026-09-22
+
+================================================================================
+7. FUTURE RECOMMENDATIONS & BACKLOG
+================================================================================
+- [Pfad A] Consider updating `pyproject.toml` classifiers under setuptools 77+ once setuptools license deprecation is standardized across the fleet.
+- [Pfad B] Monitor PyPI release once maintainer decides on a public PyPI upload.
+- [Pfad B] Consider adding an optional SQLite WAL-mode tuning guide for high-frequency agent concurrency scenarios.

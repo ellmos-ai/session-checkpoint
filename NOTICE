@@ -1,0 +1,59 @@
+session-checkpoint
+==================
+
+Copyright (c) 2026 Lukas Geiger (c/o ellmos-ai / open-bricks)
+Licensed under the MIT License. See LICENSE for the full license text.
+
+This NOTICE file is provided for informational and attribution purposes
+alongside the license and must be preserved in redistributions of the
+source code and in substantial portions of the software.
+
+--------------------------------------------------------------------
+1. Purpose & Architecture
+--------------------------------------------------------------------
+
+session-checkpoint is a local, application-neutral session checkpoint
+storage carrier with cryptographic SHA-256 integrity verification,
+strict namespace isolation, bounded memory/resource allocation caps,
+and reversible export/import bundles for Python applications and JSON CLI
+tooling.
+
+The package is explicitly:
+  * 100% Local-First and Air-Gapped (Zero Network Egress).
+  * Application-neutral (no inspection of application schemas).
+  * Conservative and safe (dry-run deletion and imports by default).
+  * Unprivileged (RunAsInvoker, user-mode execution).
+
+--------------------------------------------------------------------
+2. Statutory Disclaimer / Haftung (§ 521 BGB)
+--------------------------------------------------------------------
+
+session-checkpoint is distributed free of charge as open-source software
+(unentgeltliche Bereitstellung / Schenkung gem. §§ 516 ff. BGB).
+
+Under German law (§ 521 BGB) and the terms of the MIT License, liability
+is limited to intent (Vorsatz) and gross negligence (grobe Fahrlässigkeit).
+Liability for damages to life, body, or health remains governed by
+mandatory statutory provisions.
+
+USE AT YOUR OWN RISK.
+
+--------------------------------------------------------------------
+3. Third-Party Components & Dependencies
+--------------------------------------------------------------------
+
+session-checkpoint is designed with a Zero-Mandatory-Runtime-Dependencies
+invariant. The entire core engine, SQLite persistence layer, JSON
+canonicalization, cryptographic SHA-256 hashing, and CLI rely exclusively
+on the Python Standard Library (PSF-2.0).
+
+See THIRD_PARTY_LICENSES.md for detailed dependency audits and license texts.
+
+--------------------------------------------------------------------
+4. Contact & Organization
+--------------------------------------------------------------------
+
+Source Repository: https://github.com/ellmos-ai/session-checkpoint
+Organization:      https://github.com/ellmos-ai
+Umbrella:          https://github.com/open-bricks
+Author:            Lukas Geiger

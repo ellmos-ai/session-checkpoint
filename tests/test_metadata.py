@@ -162,3 +162,87 @@ def test_version_consistency_across_manifests():
     assert pkg_version == "0.1.1"
     assert f"- Version: {pyproject_version}" in llms_text
     assert f"## {pyproject_version} —" in changelog_text
+
+
+def test_notice_attribution_and_statutory_disclaimer():
+    notice = ROOT / "NOTICE"
+    assert notice.is_file(), "NOTICE file must exist"
+    text = notice.read_text(encoding="utf-8")
+    assert "Lukas Geiger" in text
+    assert "ellmos-ai" in text
+    assert "open-bricks" in text
+    assert "§ 521 BGB" in text
+    assert "MIT License" in text
+
+
+def test_third_party_licenses_sbom_invariants():
+    sbom = ROOT / "THIRD_PARTY_LICENSES.md"
+    assert sbom.is_file(), "THIRD_PARTY_LICENSES.md must exist"
+    text = sbom.read_text(encoding="utf-8")
+    assert "Level 1 Software Bill of Materials (SBOM)" in text
+    assert "Zero-Mandatory-Runtime-Dependencies" in text
+    for i in range(1, 11):
+        if i == 1:
+            code = "INV-LOCAL-01"
+        elif i == 2:
+            code = "INV-CANON-02"
+        elif i == 3:
+            code = "INV-FAILCLOSE-03"
+        elif i == 4:
+            code = "INV-BOUNDARY-04"
+        elif i == 5:
+            code = "INV-NAMESP-05"
+        elif i == 6:
+            code = "INV-LIMITS-06"
+        elif i == 7:
+            code = "INV-DRYRUN-07"
+        elif i == 8:
+            code = "INV-PERM-08"
+        elif i == 9:
+            code = "INV-REVERSIBLE-09"
+        else:
+            code = "INV-SLA-10"
+        assert code in text, f"Missing invariant {code} in THIRD_PARTY_LICENSES.md"
+    assert "RunAsInvoker" in text
+
+
+def test_bilingual_navigation_parity_and_anchors():
+    en = (ROOT / "README.md").read_text(encoding="utf-8")
+    de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    for i in range(1, 19):
+        anchor = f'<a id="sec-{i:02d}">'
+        assert anchor in en, f"Missing anchor {anchor} in README.md"
+        assert anchor in de, f"Missing anchor {anchor} in README_de.md"
+
+
+def test_personas_and_comparative_matrix_present():
+    en = (ROOT / "README.md").read_text(encoding="utf-8")
+    de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    for p in ("[PERSONA-01]", "[PERSONA-02]", "[PERSONA-03]", "[PERSONA-04]"):
+        assert p in en, f"Missing persona {p} in README.md"
+        assert p in de, f"Missing persona {p} in README_de.md"
+
+    assert "Comparative Matrix" in en
+    assert "Vergleichsmatrix" in de
+
+
+def test_security_sla_and_run_as_invoker():
+    sec = (ROOT / "SECURITY.md").read_text(encoding="utf-8")
+    en = (ROOT / "README.md").read_text(encoding="utf-8")
+    de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    assert "48 hours" in sec
+    assert "RunAsInvoker" in sec
+    assert "48 hours" in en or "48-hour" in en
+    assert "48 Stunden" in de or "48-Stunden" in de
+
+
+def test_mermaid_diagram_syntax_guardrails():
+    en = (ROOT / "README.md").read_text(encoding="utf-8")
+    de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    for text, name in [(en, "README.md"), (de, "README_de.md")]:
+        unquoted = re.search(r'^\s*[\w\-]+\[[^"\'\]\n]*\([^\)\]\n]+\)[^"\'\]\n]*\]', text, re.MULTILINE)
+        assert not unquoted, f"Unquoted parenthesis in node label in {name}: {unquoted.group(0) if unquoted else ''}"
