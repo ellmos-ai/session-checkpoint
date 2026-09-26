@@ -121,7 +121,12 @@ def test_packaging_and_pep621_classifiers():
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     assert "classifiers" in project
     classifiers = set(project["classifiers"])
-    assert "License :: OSI Approved :: MIT License" in classifiers
+    # PEP 639: a "License :: OSI Approved" trove classifier is redundant with (and, in
+    # current setuptools, incompatible with) a PEP 621 `license = "MIT"` expression --
+    # setuptools>=77 raises InvalidConfigError when both are present. The license is
+    # already declared via `license`/`license-files` above.
+    assert project.get("license") == "MIT"
+    assert "License :: OSI Approved :: MIT License" not in classifiers
     assert "Operating System :: OS Independent" in classifiers
     assert "Programming Language :: Python :: 3" in classifiers
     assert "Programming Language :: Python :: 3.10" in classifiers
