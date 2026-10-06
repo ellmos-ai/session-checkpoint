@@ -17,6 +17,7 @@ from typing import Any, Iterator
 
 SCHEMA_VERSION = 1
 EXPORT_SCHEMA = "ellmos.session-checkpoint-export.v1"
+MAX_IMPORTED_CHECKPOINT_ID = (1 << 62) - 1
 DEFAULT_MAX_PAYLOAD_BYTES = 1024 * 1024
 DEFAULT_MAX_IMPORT_CHECKPOINTS = 1000
 DEFAULT_MAX_IMPORT_PAYLOAD_BYTES = 16 * 1024 * 1024
@@ -134,6 +135,16 @@ def _positive_int(field: str, value: Any) -> int:
     if type(value) is not int or value <= 0:
         raise CheckpointValidationError(f"{field} must be a positive integer")
     return value
+
+
+def _import_checkpoint_id(value: Any) -> int:
+    checkpoint_id = _positive_int("id", value)
+    if checkpoint_id > MAX_IMPORTED_CHECKPOINT_ID:
+        raise CheckpointValidationError(
+            "id exceeds the safe import limit of "
+            f"{MAX_IMPORTED_CHECKPOINT_ID}"
+        )
+    return checkpoint_id
 
 
 def _nonnegative_int(field: str, value: Any) -> int:
@@ -536,7 +547,7 @@ class CheckpointStore:
                 f"Imported checkpoint {item.get('id')} has a payload hash mismatch"
             )
         return Checkpoint(
-            id=_positive_int("id", item["id"]),
+            id=_import_checkpoint_id(item["id"]),
             namespace=prepared.namespace,
             session_id=prepared.session_id,
             kind=prepared.kind,

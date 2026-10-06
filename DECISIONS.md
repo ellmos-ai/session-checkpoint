@@ -1,8 +1,8 @@
 # DECISIONS.md — Architecture decisions
 
 **Version:** 0.1
-**Updated:** 2026-08-09
-**Reason:** Sensitive-file and import-resource boundary
+**Updated:** 2026-09-21
+**Reason:** Bound imported IDs below the SQLite AUTOINCREMENT ceiling
 **Purpose:** Preserve why the state boundary has this shape.
 
 ## ADR-001: Standalone capability instead of a chat-router extension
@@ -61,6 +61,14 @@ The owner selected the MIT licence on 2026-08-22. The licence and package metada
 SPDX identifier `MIT`. This decision permits later distribution but does not make the repository
 public, publish a package, create a tag, or satisfy the remaining integration and release gates in
 `PRIVATE.txt`.
+
+## ADR-009: Imported IDs preserve SQLite allocator headroom
+
+Exports retain numeric local IDs so round trips stay deterministic, but imported IDs are untrusted
+input to SQLite's signed 64-bit AUTOINCREMENT allocator. An imported maximum row ID permanently
+exhausts future automatic allocation even if that row is deleted. Imports therefore reject IDs
+above 2^62 - 1. This preserves half of the positive SQLite row-ID domain for later local creates
+while leaving any practically reachable carrier ID portable.
 
 ---
 <!-- REMEMBER: ENDUSERTEXTE BEKOMMEN ECHTE UMLAUTE Ü Ö Ä -->

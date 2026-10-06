@@ -11,6 +11,8 @@
 - Added German statutory disclaimer (§ 521 BGB Gefälligkeitsrecht) and 48h Security Response SLA in `SECURITY.md`, `README.md`, and `README_de.md`.
 - Expanded local `MARKETING-LOG.txt` documenting Pfad B Discoverability & Architecture audit.
 - Expanded contract test suite in `tests/test_metadata.py` ensuring navigation parity, anchor reciprocity, persona definitions, and invariant integrity.
+- Reject imported checkpoint IDs above `2^62 - 1` before any SQLite lookup or write, preserving
+  allocator headroom and preventing a one-record bundle from permanently blocking later creates.
 
 ## 0.1.1 — 2026-09-18
 
